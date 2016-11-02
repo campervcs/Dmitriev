@@ -1,8 +1,10 @@
 package com.mycompany.terisproj;
 
+import com.vaadin.annotations.Push;
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -11,6 +13,8 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -30,7 +34,9 @@ import org.vaadin.hezamu.canvas.Canvas;
 
 
 //Главный класс
-@Theme("mytheme")
+@Title("Vaadin Tetris")
+@Push
+@Theme("valo")
 public class MyUI extends UI {
     
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
@@ -39,7 +45,7 @@ public class MyUI extends UI {
     }
     
     //Скорость изменения картинки/движения фигур и тд
-    private static int TIME_TICK = 300;
+    private static int TIME_TICK = 500;
     
     //Определим размеры каждой ячейки
     protected static final int TILE_SIZE = 30;
@@ -49,7 +55,7 @@ public class MyUI extends UI {
     private static int FIELD_WIDTH=15;
     
     //Фон игрового поля (по-умолчанию черный)
-    public static String BACK_COLOR="#000";
+    public static String PLAYGROUND_COLOR="#000";
     
     //Пока не буду заморачиваться, сделаю просто в столбик все. Позже все будет красиво
     private VerticalLayout layout;
@@ -57,7 +63,7 @@ public class MyUI extends UI {
     private Canvas canvas;
     protected boolean running;
     //Позже будет класс, который будет содержать операции с игрой (Например перерисовка объектов, поля и тд.)
-    //protected Game game;
+    protected Game game = new Game(10, 20);
     
     //Счетчик очков
     private Label score;
@@ -72,60 +78,147 @@ public class MyUI extends UI {
         setContent(layout);
         
         //Создадим кнопочки для движения и переворачивания фигур
-        Button buttonLeft = new Button("Влево");
-        //Честно еще не знаю полностью про лямбда выражения, он сам предложил заменить
-        buttonLeft.addClickListener(e -> {
-            //game.goLeft();
-            //redrawGame();
+        final Button buttonLeft = new Button("Влево");
+        buttonLeft.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                game.goLeft();
+                redrawGame();
+            }
         });
         //Для определения какую именно клавишу нажали
         buttonLeft.setClickShortcut(KeyCode.ARROW_LEFT);
         
-        Button buttonRight = new Button("Вправо");
-        buttonLeft.addClickListener(e -> {
-            //game.goLeft();
-            //redrawGame();
+        final Button buttonRight = new Button("Вправо");
+        buttonRight.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                game.goRight();
+                redrawGame();
+            }
         });
         buttonLeft.setClickShortcut(KeyCode.ARROW_RIGHT);
         
         //Кнопка для поворота фигуры
-        Button buttonRotate = new Button("Повернуть");
-        buttonRotate.addClickListener(e -> {
-            //game.rotate();
-            //redrawGame();
+        final Button buttonRotate = new Button("Повернуть");
+        buttonRotate.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                game.rotate();
+                redrawGame();
+            }
         });
         buttonRotate.setClickShortcut(KeyCode.SPACEBAR);
         
-        Button buttonFall = new Button("Кинуть вниз");
-        buttonFall.addClickListener(e -> {
-            //game.fall();
-            //redrawGame();
+        final Button buttonFall = new Button("Кинуть вниз");
+        buttonFall.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                game.fall();
+                redrawGame();
+            }
         });
         
+        final Button dropBtn = new Button("[space]");
+        dropBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                game.fall();
+                redrawGame();
+            }
+        });
+        
+        dropBtn.setClickShortcut(KeyCode.ARROW_DOWN);
+        
+        
+        final Button restartBtn = new Button();
+        restartBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                running = !running;
+                if (running) {
+                    game = new Game(10, 20);
+                    startGameThread();
+                    dropBtn.focus();
+                } else {
+                    endOfGame();
+                }
+            }
+        });
         
         layout.addComponent(new HorizontalLayout(
-                buttonLeft, buttonRight, buttonFall, buttonRotate
+                buttonLeft, buttonRight, buttonFall, buttonRotate, restartBtn
         ));
         
         
+        //Создадим экземпляр canvas
+        canvas =new Canvas();
+        layout.addComponent(canvas);
+        //Укжаем его размеры
+        canvas.setWidth((TILE_SIZE * FIELD_WIDTH)+"px");
+        canvas.setHeight((TILE_SIZE * FIELD_HEIGHT)+"px");
+        score = new Label("");
+        layout.addComponent(score);
         
-        //final VerticalLayout layout = new VerticalLayout();
         
-        final TextField name = new TextField();
-        name.setCaption("Type your name here:");
-
-        Button button = new Button("Click Me");
-        button.addClickListener( e -> {
-            layout.addComponent(new Label("Thanks " + name.getValue() 
-                    + ", it works!"));
-        });
-        
-        layout.addComponents(name, button);
-        layout.setMargin(true);
-        layout.setSpacing(true);
-        
-        setContent(layout);
     }
 
+    //Поток для работы игры с шагами для паузы (чтобы не моментально падали блоки)
+    protected synchronized void startGameThread() {
+        Thread thread = new Thread() {
+            public void run(){
+                while (running && !game.isEndOfGame()){
+                    redrawGame();
+                    try{
+                        sleep(TIME_TICK);
+                    }
+                    catch(InterruptedException ie){}
+                    
+                    game.oneMove();
+                    scoreUp();
+                }
+                endOfGame();
+            }
+        };
+        thread.start();
+    }
+    
+    
+    protected synchronized void scoreUp(){
+        access(() -> {
+            score.setValue("Счет: " + game.getScore());
+        });
+    }
+    
+    protected synchronized void endOfGame() {
+        running = false;
+        access(() -> {
+        Notification.show("Конец игры", "У вас очков: "  + game.getScore(), Type.HUMANIZED_MESSAGE);
+        });
+    }
+    
+    protected synchronized void redrawGame()
+    {
+        access(() ->{
+        canvas.clear();
+        canvas.setFillStyle(PLAYGROUND_COLOR);
+        canvas.fillRect(0, 0, game.getWidth() * TILE_SIZE + 2, game.getHeight() * TILE_SIZE + 2);
+        
+        ShapeTable shT = game.getStateNow();
+        for (int x=0;x<shT.getWidth();x++){
+            for(int y=0; y<shT.getHeight();y++){
+                
+                int currentTile = shT.get(x, y);
+                if(currentTile>0){
+                    
+                    String color = Shape.get(currentTile).getColor();
+                    canvas.setFillStyle(color);
+                    canvas.fillRect(x * TILE_SIZE + 1, y * TILE_SIZE + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+                }
+            }
+        }
+    });
+    }
+    
     
 }
