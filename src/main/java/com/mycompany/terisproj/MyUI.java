@@ -119,7 +119,7 @@ public class MyUI extends UI {
             }
         });
         
-        final Button dropBtn = new Button("[space]");
+        final Button dropBtn = new Button("Кинуть вниз");
         dropBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent e) {
@@ -131,13 +131,13 @@ public class MyUI extends UI {
         dropBtn.setClickShortcut(KeyCode.ARROW_DOWN);
         
         
-        final Button restartBtn = new Button();
+        final Button restartBtn = new Button("Старт игры");
         restartBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent e) {
                 running = !running;
                 if (running) {
-                    game = new Game(10, 20);
+                    game = new Game(FIELD_WIDTH, FIELD_HEIGHT);
                     startGameThread();
                     dropBtn.focus();
                 } else {
@@ -147,7 +147,7 @@ public class MyUI extends UI {
         });
         
         layout.addComponent(new HorizontalLayout(
-                buttonLeft, buttonRight, buttonFall, buttonRotate, restartBtn
+                restartBtn, buttonLeft, buttonRight, buttonFall, buttonRotate 
         ));
         
         

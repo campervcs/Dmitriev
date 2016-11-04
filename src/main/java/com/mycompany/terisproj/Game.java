@@ -130,7 +130,7 @@ public class Game {
     
     //Бросить вниз
     public void fall(){
-        while(playground.fitsInto(currentShape, koordinate_x, koordinate_y)){
+        while(playground.fitsInto(currentShape, koordinate_x, koordinate_y+1)){
             koordinate_y++;
         }
     }
