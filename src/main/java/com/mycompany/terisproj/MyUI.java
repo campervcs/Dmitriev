@@ -36,7 +36,7 @@ import org.vaadin.hezamu.canvas.Canvas;
 //Главный класс
 @Title("Vaadin Tetris")
 @Push
-@Theme("valo")
+@Theme("mytheme")
 public class MyUI extends UI {
     
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
@@ -63,11 +63,12 @@ public class MyUI extends UI {
     private Canvas canvas;
     protected boolean running;
     //Позже будет класс, который будет содержать операции с игрой (Например перерисовка объектов, поля и тд.)
-    protected Game game = new Game(10, 20);
+    protected Game game = new Game(FIELD_WIDTH, FIELD_HEIGHT);
     
     //Счетчик очков
     private Label score;
-    
+    private Label difficultLabel;
+    int difficult=5;
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         //Создали вертикальный макет
@@ -76,6 +77,29 @@ public class MyUI extends UI {
         layout.setMargin(true);
         //Добавил на экран
         setContent(layout);
+        
+        
+        
+        final Button difUpButton = new Button("Увеличить сложность");
+        difUpButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                TIME_TICK-=200; difficult-=2;
+                if (TIME_TICK<=-100) {TIME_TICK+=200; difficult+=2;}
+                difReload();
+            }
+        });
+        final Button difDownButton = new Button("Уменьшить сложность");
+        difDownButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent e) {
+                TIME_TICK+=200; difficult+=2;
+                if (TIME_TICK>=1100) {TIME_TICK-=200; difficult-=2;}
+                difReload();
+            }
+        });
+        
+        
         
         //Создадим кнопочки для движения и переворачивания фигур
         final Button buttonLeft = new Button("Влево");
@@ -86,8 +110,6 @@ public class MyUI extends UI {
                 redrawGame();
             }
         });
-        //Для определения какую именно клавишу нажали
-        buttonLeft.setClickShortcut(KeyCode.ARROW_LEFT);
         
         final Button buttonRight = new Button("Вправо");
         buttonRight.addClickListener(new Button.ClickListener() {
@@ -97,7 +119,6 @@ public class MyUI extends UI {
                 redrawGame();
             }
         });
-        buttonLeft.setClickShortcut(KeyCode.ARROW_RIGHT);
         
         //Кнопка для поворота фигуры
         final Button buttonRotate = new Button("Повернуть");
@@ -108,7 +129,6 @@ public class MyUI extends UI {
                 redrawGame();
             }
         });
-        buttonRotate.setClickShortcut(KeyCode.SPACEBAR);
         
         final Button buttonFall = new Button("Кинуть вниз");
         buttonFall.addClickListener(new Button.ClickListener() {
@@ -128,8 +148,6 @@ public class MyUI extends UI {
             }
         });
         
-        dropBtn.setClickShortcut(KeyCode.ARROW_DOWN);
-        
         
         final Button restartBtn = new Button("Старт игры");
         restartBtn.addClickListener(new Button.ClickListener() {
@@ -137,6 +155,7 @@ public class MyUI extends UI {
             public void buttonClick(Button.ClickEvent e) {
                 running = !running;
                 if (running) {
+                    TIME_TICK=500;
                     game = new Game(FIELD_WIDTH, FIELD_HEIGHT);
                     startGameThread();
                     dropBtn.focus();
@@ -146,8 +165,14 @@ public class MyUI extends UI {
             }
         });
         
+        
+        score = new Label("");
+        score.setWidth("150");
+        difficultLabel=new Label ("");
+        difficultLabel.setWidth("150");
+        
         layout.addComponent(new HorizontalLayout(
-                restartBtn, buttonLeft, buttonRight, buttonFall, buttonRotate 
+                restartBtn, buttonLeft, buttonRight, buttonFall, buttonRotate,difUpButton, difDownButton, difficultLabel, score
         ));
         
         
@@ -157,8 +182,7 @@ public class MyUI extends UI {
         //Укжаем его размеры
         canvas.setWidth((TILE_SIZE * FIELD_WIDTH)+"px");
         canvas.setHeight((TILE_SIZE * FIELD_HEIGHT)+"px");
-        score = new Label("");
-        layout.addComponent(score);
+        
         
         
     }
@@ -176,6 +200,7 @@ public class MyUI extends UI {
                     
                     game.oneMove();
                     scoreUp();
+                    difReload();
                 }
                 endOfGame();
             }
@@ -183,10 +208,12 @@ public class MyUI extends UI {
         thread.start();
     }
     
-    
+    protected synchronized void difReload(){
+        difficultLabel.setValue("   Сложность: "+difficult);
+    }
     protected synchronized void scoreUp(){
         access(() -> {
-            score.setValue("Счет: " + game.getScore());
+            score.setValue("    Счет: " + game.getScore());
         });
     }
     

@@ -33,6 +33,15 @@
 
 @mixin mytheme {
   @include valo;
-
+  .v-label{
+      background: none repeat scroll 0 0 #F5F5F5;
+        border-color: #F5F5F5;
+        border-image: none;
+        border-left: 1px solid #F5F5F5;
+        border-radius: 3px 3px 3px 3px;
+        border-right: 1px solid #F5F5F5;
+        border-style: solid;
+        border-width: 1px;
+  }
   // Insert your own theme rules here
 }
