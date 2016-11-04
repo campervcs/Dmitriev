@@ -51,8 +51,8 @@ public class MyUI extends UI {
     protected static final int TILE_SIZE = 30;
     
     //Определим размеры игрового поля
-    private static int FIELD_HEIGHT=30;
-    private static int FIELD_WIDTH=15;
+    private static int FIELD_HEIGHT=20;
+    private static int FIELD_WIDTH=10;
     
     //Фон игрового поля (по-умолчанию черный)
     public static String PLAYGROUND_COLOR="#000";
@@ -172,7 +172,11 @@ public class MyUI extends UI {
         difficultLabel.setWidth("150");
         
         layout.addComponent(new HorizontalLayout(
-                restartBtn, buttonLeft, buttonRight, buttonFall, buttonRotate,difUpButton, difDownButton, difficultLabel, score
+                restartBtn, buttonLeft, buttonRight, buttonFall, buttonRotate,difUpButton, difDownButton
+        ));
+        
+        layout.addComponent(new HorizontalLayout(
+                difficultLabel, score
         ));
         
         
