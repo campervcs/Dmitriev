@@ -33,6 +33,7 @@ import org.vaadin.hezamu.canvas.Canvas;
 
 
 
+
 //Главный класс
 @Title("Vaadin Tetris")
 @Push
