@@ -92,8 +92,8 @@ public class SignUpForm extends  VerticalLayout implements View{
         formLayout.addComponent(opGender);
         
         ArrayList<String> listType = new ArrayList<>();
-        listType.add("Пользователь");
-        listType.add("Разработчик");
+        listType.add("User");
+        listType.add("Developer");
         
         cbType = new ComboBox("Тип пользователя", listType);
         cbType.setRequired(true);

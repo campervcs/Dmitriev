@@ -6,6 +6,7 @@
 package Front_End;
 
 import Back_End.MainSystem;
+import Back_End.WorkerDataBase;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Alignment;
@@ -47,9 +48,10 @@ public class Login extends  VerticalLayout implements View{
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
+                    //MainSystem.refreshUsers();
                     if (main.Login(tfIDLogin.getValue(), tfPassword.getValue())) {
                         //logged in successfully
-                        //getUI().getNavigator().navigateTo("dashboard");
+                        getUI().getNavigator().navigateTo("Home");
                         Notification.show("Успех");
                         //reset UI Components
                         tfIDLogin.setValue("");

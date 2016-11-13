@@ -9,6 +9,9 @@ import com.mysql.fabric.jdbc.FabricMySQLDriver;
 import com.vaadin.ui.Notification;
 import java.net.URI;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +52,41 @@ public class WorkerDataBase {
         
         
     }
+    
+    static ArrayList<User> allUserList = new ArrayList<User>();
+    public static ArrayList<User> getAllEntity(){
+        String sqlQuery="SELECT * FROM user";
+        ResultSet resultSet=null;
+        Connection con = null;
+        Statement statement = null;
+        try {
+            con = getConnection();
+            statement = con.createStatement();
+            resultSet = statement.executeQuery(sqlQuery);
+        } catch (Exception ex) {
+            Logger.getLogger(WorkerDataBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        try {
+            while(resultSet.next()) {
+                User user = new User();
+                user.setzID(resultSet.getString("user_id"));
+                user.setName(resultSet.getString("user_name"));
+                user.setPassword(resultSet.getString("user_password"));
+                user.setDOB(resultSet.getString("user_DOB"));
+                user.setGender(resultSet.getString("gender"));
+                user.setType(resultSet.getString("type"));
+                allUserList.add(user);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(WorkerDataBase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return allUserList;
+    }
+    
+    
+    
+    
     
     public static Boolean isAcceptUser(String name, String password) throws ClassNotFoundException, SQLException{
         String sqlQuery="SELECT * FROM business.user WHERE user_name='"+name+"' and user_password='"+password+"'";

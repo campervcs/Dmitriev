@@ -12,11 +12,11 @@ import java.util.Date;
  * @author Winter Fox
  */
 public class SimpleUser extends User{
-    public SimpleUser(String zID, String name, String password, Date DOB, String gender) {
-        super(zID, name, password, DOB, gender);
+    public SimpleUser(String zID, String name, String password, String type, String DOB, String gender) {
+        super(zID, name, password, type, DOB, gender);
     }
     
     public String getType() {
-        return "SimpleUser";
+        return "Пользователь";
     }
 }

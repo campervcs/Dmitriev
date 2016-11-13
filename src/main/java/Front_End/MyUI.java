@@ -48,25 +48,13 @@ public class MyUI extends UI {
     
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-//        Statement statement = null;
-//        Connection connection=null;
-//        try{
-//            Class.forName("com.mysql.jdbc.Driver");
-//            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-//            
-//            statement = connection.createStatement();
-//            statement.executeUpdate(
-//                    "INSERT INTO user (user_name, user_password, type)" 
-//            + " VALUES ('aaaa', 'aaaa', 'ffffff' )");
-//        } catch (ClassNotFoundException | SQLException ex) {
-//            Logger.getLogger(MyUI.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+//        
         
         Navigator navigator = new Navigator(this, this);
         
         navigator.addView("Login", new Login());
         navigator.addView("SignUpForm", new SignUpForm());
-        
+        navigator.addView("Home", new Home());
         navigator.navigateTo("Login");
     }
 

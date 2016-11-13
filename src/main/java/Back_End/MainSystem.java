@@ -24,38 +24,61 @@ public class MainSystem {
     
     private static ArrayList<User> userList = new ArrayList<>();
     private static User currentUser;
+
     
     public ArrayList<User> getUserList() {
+        
+        userList=WorkerDataBase.getAllEntity();
         return this.userList;
     }
     
-    public User getCurrentUser() {
-        return this.currentUser;
+    public static User getCurrentUser() {
+        return MainSystem.currentUser;
+    }
+    public static void refreshUsers(){
+        userList=WorkerDataBase.getAllEntity();
     }
     
     public ArrayList<Developer> getDevelopers() { //from user list
+        refreshUsers();
         ArrayList<Developer> DeveloperList = new ArrayList<>();
-        for (User Developer : userList) {
-            if (Developer instanceof Developer) {
-                DeveloperList.add((Developer) Developer);
+        for (User user : userList) {
+            if (user instanceof Developer) {
+                DeveloperList.add((Developer) user);
             }
         }
         return DeveloperList;
     }
 
     public ArrayList<SimpleUser> getSimpleUser() { //from user list
+        refreshUsers();
         ArrayList<SimpleUser> studentList = new ArrayList<>();
-        for (User student : userList) {
-            if (student instanceof SimpleUser) {
-                studentList.add((SimpleUser) student);
+        for (User user : userList) {
+            if (user instanceof SimpleUser) {
+                studentList.add((SimpleUser) user);
             }
         }
         return studentList;
     }
     
     public Boolean Login(String name, String password) throws ClassNotFoundException, SQLException  {
-        
+        refreshUsers();
+        //currentUser=userList.get(0);
         Boolean result = WorkerDataBase.isAcceptUser(name, password);
+        if(result){
+            for(int i=0;i<userList.size();i++){
+                //currentUser=userList.get(3);
+                if(userList.get(i).getName().equals(name)){
+                    currentUser = userList.get(i);
+                }
+            }
+            
+//            for (User user: userList){
+//                if(user.name.equals(name)){
+//                    this.currentUser = user;
+//                }
+//            }
+        }
         return result;
         
         
