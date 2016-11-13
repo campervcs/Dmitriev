@@ -108,13 +108,13 @@ public class SignUpForm extends  VerticalLayout implements View{
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    main.signUp(tfName.getValue(), tfPassword.getValue(),cbType.getValue().toString(), /*dfDOB.getValue().toString(),*/ opGender.getCaption());
+                    main.signUp(tfName.getValue(), tfPassword.getValue(),cbType.getValue().toString(), dfDOB.getValue(), opGender.getCaption());
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(SignUpForm.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
                     Logger.getLogger(SignUpForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               Notification.show("Регистрация пройдена успешно!");
+               Notification.show("Регистрация прошла успешно!");
                tfName.setValue("");
                tfPassword.setValue("");
                getUI().getNavigator().navigateTo("Login");

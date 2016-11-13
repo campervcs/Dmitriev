@@ -22,6 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -36,14 +37,31 @@ import java.util.logging.Logger;
  */
 @Theme("mytheme")
 public class MyUI extends UI {
-    public static final String USERNAME = "root";
-    public static final String PASSWORD = "root";
-    public static final String URL = "jdbc:mysql://localhost:3306/business";
+//    public static final String USERNAME = "root";
+//    public static final String PASSWORD = "root";
+//    public static final String URL = "jdbc:mysql://localhost:3306/business";
+//    
+//    static ResultSet resultSet=null;
+    
+    
+    
+    
     @Override
     protected void init(VaadinRequest vaadinRequest) {
+//        Statement statement = null;
+//        Connection connection=null;
+//        try{
+//            Class.forName("com.mysql.jdbc.Driver");
+//            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+//            
+//            statement = connection.createStatement();
+//            statement.executeUpdate(
+//                    "INSERT INTO user (user_name, user_password, type)" 
+//            + " VALUES ('aaaa', 'aaaa', 'ffffff' )");
+//        } catch (ClassNotFoundException | SQLException ex) {
+//            Logger.getLogger(MyUI.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
-        
-      
         Navigator navigator = new Navigator(this, this);
         
         navigator.addView("Login", new Login());

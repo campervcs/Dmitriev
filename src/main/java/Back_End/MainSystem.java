@@ -5,6 +5,7 @@
  */
 package Back_End;
 
+import com.vaadin.ui.Notification;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.logging.Logger;
 public class MainSystem {
     public static final String USERNAME = "root";
     public static final String PASSWORD = "root";
-    public static final String URL = "jdbc:mysql://localhost:3306/mysql?useSSL=false";
+    public static final String URL = "jdbc:mysql://localhost:3306/business";
     
     private static ArrayList<User> userList = new ArrayList<>();
     private static User currentUser;
@@ -33,13 +34,13 @@ public class MainSystem {
     }
     
     public ArrayList<Developer> getDevelopers() { //from user list
-        ArrayList<Developer> teacherList = new ArrayList<>();
-        for (User teacher : userList) {
-            if (teacher instanceof Developer) {
-                teacherList.add((Developer) teacher);
+        ArrayList<Developer> DeveloperList = new ArrayList<>();
+        for (User Developer : userList) {
+            if (Developer instanceof Developer) {
+                DeveloperList.add((Developer) Developer);
             }
         }
-        return teacherList;
+        return DeveloperList;
     }
 
     public ArrayList<SimpleUser> getSimpleUser() { //from user list
@@ -54,18 +55,8 @@ public class MainSystem {
     
     public Boolean Login(String name, String password) throws ClassNotFoundException, SQLException  {
         
-        ResultSet result1 = WorkerDataBase.getUsersEntity();
-        
-        try {
-            while(result1.next()){
-                if(result1.getString("user_name").equals(name) && result1.getString("user_password").equals(password)){
-                    this.currentUser = (User) result1;
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(MainSystem.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Boolean result = WorkerDataBase.isAcceptUser(name, password);
+        return result;
         
         
 //        for (User user : userList) {
@@ -74,18 +65,23 @@ public class MainSystem {
 //                return true;    //move to next screen
 //            }
 //        }
-        return false;   //show notification
+        //return false;   //show notification
     }
     
     public void Logout() {
         this.currentUser = null;
     }
     
-    public void signUp(String name, String password, String type, /*Date DOB,*/ String gender) throws ClassNotFoundException, SQLException {
+    public void signUp(String name, String password, String type, Date DOB, String gender) throws ClassNotFoundException, SQLException {
+        
+        
+        String insertTableSQL = "INSERT INTO user (user_name, user_password, user_DOB, gender, type)" 
+            + " VALUES ( '"+name+"' , '"+password+"', '"+DOB+"' , '"+gender+"' , '"+type+"'  )";
+        
+        //Notification.show(insertTableSQL);
         
         //WorkerDataBase.addEntity("insert into bisiness.user (user_name, user_password, user_DOB, gender, type) values (\"name\", \"password\", \"DOB\", \"gender\", \"type\")");
-        WorkerDataBase.addEntity("insert into bisiness.user (user_name, user_password, gender, type) values (\"name\", \"password\", \"gender\", \"type\")");
-
+        WorkerDataBase.addEntity(insertTableSQL);
         
         
 //        if (type.equals("SimpleUser")) {
